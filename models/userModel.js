@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcryptjs from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const userSchema = mongoose.Schema({
     username:{
@@ -10,7 +11,6 @@ const userSchema = mongoose.Schema({
     email:{
         type: String,
         required:[true,'email is required'],
-        // validate:validator.isEmail,
     },
     password:{
         type: String,
@@ -27,4 +27,12 @@ userSchema.pre("save",async function() {
     this.password = await bcryptjs.hash(this.password,salt);
 });
 
+userSchema.methods.createJWT =  function(){
+    return jwt.sign({id:this._id},process.env.jwt_key,{expiresIn:"1d"});
+}
+userSchema.methods.matchPassword =  async function(password){
+
+const isMatch = await bcryptjs.compare(password,this.password);
+return isMatch;
+}
 export default mongoose.model('user', userSchema);

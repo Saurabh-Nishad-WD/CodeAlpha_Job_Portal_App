@@ -6,8 +6,8 @@ const connectDb = async(req,res) =>{
         console.log(`connected to mongo server ${mongoose.connection.host}`)
     }
     catch(err){
-        res.send(err);
-    }
+res.send(err);
+}
 }
 
 export default connectDb;

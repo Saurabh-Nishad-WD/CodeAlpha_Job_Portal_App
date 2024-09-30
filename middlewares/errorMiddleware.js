@@ -1,8 +1,10 @@
 
 const errorMiddleware =  (err,req,res,next) => {
 
-    console.log(err);
-    res.status(500).send({message:"error",err});
+        res.status(500).send({
+        Message:"error",
+        error:err
+    });
 
 };
 
