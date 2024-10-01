@@ -1,4 +1,5 @@
 import jobModel from "../models/jobModel.js";
+import responseModel from "../models/responseModel.js";
 import userModel from "../models/userModel.js";
 
 export const create = async (req,res,next) => {
@@ -152,4 +153,94 @@ export const deleteJob = async (req,res,next) => {
      }
  }
 
- export default {create,getAllJob,getJob,deleteJob};
+export const applier = async (req,res,next) => {
+    try{
+
+        const applier = await userModel.findOne({_id:req.params.id});
+        if(!applier){
+            return next("no applier found");
+        }
+
+        res.status(200).send({
+            message:"applier found",
+            applier
+        });
+
+    }
+    
+    catch(err){
+       return next("applier finding error");
+     }
+ }
+export const response = async (req,res,next) => {
+    try{
+
+        const user = await userModel.findOne({_id:req.body.id});
+        if(!user){
+           return next("Un-Authorised request");
+        }
+        const applier = await userModel.findOne({_id:req.params.id});
+        if(!applier){
+            return next("please provide applier detailes");
+         }
+
+        const{status} = req.body;
+        if(!status){
+            return next("please provide status");
+        }
+
+        const newStatus = new responseModel({
+            user:applier._id,
+            status:status
+        });
+
+        await newStatus.save();
+
+        res.status(200).send({
+            message:"status send",
+            newStatus
+        });
+
+    }
+    
+    catch(err){
+       return next("status sending error");
+     }
+ }
+export const updateStatus = async (req,res,next) => {
+    try{
+
+        const user = await userModel.findOne({_id:req.body.id});
+        if(!user){
+           return next("Un-Authorised request");
+        }
+        const newStatus = await responseModel.findOne({_id:req.params.id});
+        if(!newStatus){
+            return next("status finding error");
+         }
+
+         const preStatus = newStatus.status;
+
+        const{status} = req.body;
+        if(!status){
+            return next("please provide status");
+        }
+
+        newStatus.status = status;
+
+        await newStatus.save();
+
+        res.status(200).send({
+            message:"status updated",
+            preStatus,
+            newStatus
+        });
+
+    }
+    
+    catch(err){
+       return next("status updating error");
+     }
+ }
+
+ export default {create,getAllJob,getJob,deleteJob,applier,response,updateStatus};
