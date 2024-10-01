@@ -1,5 +1,6 @@
 import jobModel from "../models/jobModel.js";
 import listnigModel from "../models/listnigModel.js";
+import profileModel from "../models/profileModel.js";
 import userModel from "../models/userModel.js";
 
 export const get = async (req,res,next) => {
@@ -23,7 +24,7 @@ export const get = async (req,res,next) => {
  }
 export const update = async (req,res,next) => {
         try{
-            const {password,email,newPassword,location} = req.body;
+            const {password,username,email,newPassword,location} = req.body;
     
             if(!password){
               return next("please provide password");
@@ -36,16 +37,19 @@ export const update = async (req,res,next) => {
     
             //    const isMatch =  await bcryptjs.compare(password,user.password);
                
-            // if(!isMatch){
-            //   return res.status(500).send({
-            //       message:"Un-Authorised access"
-            //   });
-            //  }
+            if(!isMatch){
+              return res.status(500).send({
+                  message:"Un-Authorised access"
+              });
+             }
     
-               if(!email && !newPassword && !location){
+               if(!email && !newPassword && !location && !username){
                return next("nothing changed");
                }           
     
+            if(username){
+                return next("username can't change once created");
+               }
             if(email){
                 user.email = email;
                }
@@ -138,6 +142,47 @@ export const update = async (req,res,next) => {
      }
 
 
+    export const createProfile = async (req,res,next) => {
+        try{
+    
+            const user = await userModel.findOne({_id:req.body.id});
+            if(!user){
+                return next("no user available");
+            }
+            const exist = await profileModel.findOne({username:user.username});
+            if(exist){
+                return next("profile allready exists, You can update/change it")
+            }
+            
+            
+            const {about,worktype,workExperience,workLocation} = req.body;
+            if(!about || !worktype|| !workExperience || !workLocation){
+                return next("please provide all mendetory field");
+            }
+            
+            const newProfile = new profileModel({
+                username:user.username,
+                about,
+                worktype,
+                workExperience,
+                workLocation
+            });
+            
+            await newProfile.save();
+            
+            res.status(200).send({
+                message:`profile successfuly created`,
+                newProfile
+            });
+            
+        }
+        
+        catch(err){
+           return next("profile getting error");
+         }
+     }
+
+
     export const apply = async (req,res,next) => {
         try{
 
@@ -145,15 +190,19 @@ export const update = async (req,res,next) => {
             if(!user){
                return next("Un-Authorised request");
             }
+            const profile = await profileModel.findOne({username:user.username});
+            if(!profile){
+               return next("profile not fetched");
+            }
 
-            const {position,worktype,workLocation,resume} = req.body;
+            const {position,worktype,workExperience,workLocation,resume} = req.body;
 
             if(!position || !worktype|| !workExperience || !workLocation || !resume){
                 return next("please provide all mendetory field");
              }
 
              const apply = new listnigModel({
-                user:user._id,
+                profile:profile,
                 position,
                 worktype,
                 workExperience,
@@ -166,7 +215,10 @@ export const update = async (req,res,next) => {
 
             res.status(200).send({
                 message:`successfuly applied`,
-                apply
+                profile,
+                position:apply.position,
+                resume:apply.resume,
+                date:Date.now()
             });
     
         }
@@ -175,4 +227,4 @@ export const update = async (req,res,next) => {
            return next("job apply error");
          }
      }
- export default {get,update,getJob,getCompanyJob,apply}
+ export default {get,update,getJob,getCompanyJob,createProfile,apply}

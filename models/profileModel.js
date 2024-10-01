@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
 
-const listningSchema = mongoose.Schema({
-    profile:{
-       
-    },
-    position:{
+const profileSchema = mongoose.Schema({
+    username:{
         type: String,
-        required:[true,'please provide position'],
+        required:[true,'username is required']
+    },
+    about:{
+        type: String,
+        required:[true,'please provide position']
     },
     worktype:{
         type: String,
@@ -21,12 +22,8 @@ const listningSchema = mongoose.Schema({
     workLocation:{
         type: String,
         required:[true,"workLocation is required"]
-    },
-    resume:{
-        type: String,
-        required:[true,"resume is required"]
-    },
+    }
 
 },{timestamps:true});
 
-export default mongoose.model('listing', listningSchema);
+export default mongoose.model('profile', profileSchema);
