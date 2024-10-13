@@ -32,17 +32,5 @@ const jobSchema = mongoose.Schema({
     }
 },{timestamps:true});
 
-// userSchema.pre("save",async function() {
-//     const salt = await bcryptjs.genSalt(10);
-//     this.password = await bcryptjs.hash(this.password,salt);
-// });
 
-// userSchema.methods.createJWT =  function(){
-//     return jwt.sign({id:this._id},process.env.jwt_key,{expiresIn:"1d"});
-// }
-// userSchema.methods.matchPassword =  async function(password){
-
-// const isMatch = await bcryptjs.compare(password,this.password);
-// return isMatch;
-// }
 export default mongoose.model('job', jobSchema);

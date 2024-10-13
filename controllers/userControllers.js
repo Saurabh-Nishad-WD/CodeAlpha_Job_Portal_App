@@ -3,6 +3,7 @@ import listnigModel from "../models/listnigModel.js";
 import profileModel from "../models/profileModel.js";
 import userModel from "../models/userModel.js";
 
+
 export const get = async (req,res,next) => {
     try{
 
@@ -185,28 +186,32 @@ export const update = async (req,res,next) => {
 
     export const apply = async (req,res,next) => {
         try{
-
+            
             const user = await userModel.findOne({_id:req.body.id});
             if(!user){
-               return next("Un-Authorised request");
+                return next("Un-Authorised request");
             }
             const profile = await profileModel.findOne({username:user.username});
             if(!profile){
-               return next("profile not fetched");
+                return next("profile not fetched");
             }
-
-            const {position,worktype,workExperience,workLocation,resume} = req.body;
-
-            if(!position || !worktype|| !workExperience || !workLocation || !resume){
+            
+            const {position,isProfile,resume} = req.body;
+            
+            if(!position || !resume ||!isProfile){
                 return next("please provide all mendetory field");
-             }
+            }
+            
+            if(isProfile == false){
+                return next("please first make your profile in the app");
+            }
 
              const apply = new listnigModel({
                 profile:profile,
                 position,
-                worktype,
-                workExperience,
-                workLocation,
+                worktype:profile.worktype,
+                workExperience:profile.workExperience,
+                workLocation:profile.workLocation,
                 resume
              });
 
@@ -227,4 +232,5 @@ export const update = async (req,res,next) => {
            return next("job apply error");
          }
      }
+
  export default {get,update,getJob,getCompanyJob,createProfile,apply}

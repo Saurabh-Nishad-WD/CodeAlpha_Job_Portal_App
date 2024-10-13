@@ -8,7 +8,7 @@ const statusSchema = mongoose.Schema({
     },
     status:{
         type: String,
-        enum:['pending','procecing','accepted','rejected'],
+        enum:['pending','procecing','selected','rejected'],
         default:"pending",
         required:[true,'please provide staus'],
     }

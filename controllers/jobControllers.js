@@ -10,14 +10,14 @@ export const create = async (req,res,next) => {
            return next("Un-Authorised request");
         }
 
-        const{company,position,status,worktype,workLocation,createdBy} = req.body;
+        const{company,position,status,worktype,workLocation} = req.body;
 
-        if(!company || !position ||!status || !worktype || !workLocation ||!createdBy){
+        if(!company || !position ||!status || !worktype || !workLocation){
 
             return next("please provide all mendetory field")
         }
 
-        const exist = await jobModel.findOne({company,position,status,worktype,workLocation,createdBy});
+        const exist = await jobModel.findOne({company,position,status,worktype,workLocation});
         if(exist){
             return next("job seems to be allready exists, Please confirm or recheck");
         }
@@ -28,7 +28,7 @@ export const create = async (req,res,next) => {
             status,
             worktype,
             workLocation,
-            createdBy
+            createdBy:req.body.id
         });
 
         await job.save();
@@ -47,7 +47,7 @@ export const create = async (req,res,next) => {
 export const getAllJob = async (req,res,next) => {
     try{
 
-        const jobs = await jobModel.find({createdBy:req.body.id});
+        const jobs = await jobModel.find({});
         if(!jobs){
            return next("no jobs available");
         }

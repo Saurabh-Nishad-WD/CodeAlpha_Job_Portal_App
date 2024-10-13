@@ -13,4 +13,5 @@ route.get('/:company/get-job',getCompanyJob);
 route.post('/create-profile',authMiddleware,createProfile);
 route.post('/apply',authMiddleware,apply);
 
+
 export default route;
