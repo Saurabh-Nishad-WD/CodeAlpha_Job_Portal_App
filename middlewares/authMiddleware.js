@@ -8,7 +8,6 @@ const authMiddleware =  (req,res,next) =>{
         message: "Authorization header is missing",
       });
     }
-        
     const token = authHeader.split(" ")[1];
     if (!token) {
       return res.status(401).send({
